@@ -4,3 +4,5 @@ langchain-openai
 langchain-community
 langchain-tavily
 python-dotenv
+pydantic
+langgraph-checkpoint-sqlite

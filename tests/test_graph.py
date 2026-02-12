@@ -1,64 +1,54 @@
 import unittest
 from unittest.mock import MagicMock, patch
 import os
+from pydantic import BaseModel
 
-# Set dummy env vars for testing
-os.environ["OPENAI_API_KEY"] = "fake-key"
-os.environ["TAVILY_API_KEY"] = "fake-key"
+# Mock env
+os.environ["OPENAI_API_KEY"] = "fake"
+os.environ["TAVILY_API_KEY"] = "fake"
 
 from state import AgentState
 from nodes import planner_node, editor_node
-from graph import should_continue
+from graph import router_logic
 
-class TestGraphNodes(unittest.TestCase):
+class TestProductionGraph(unittest.TestCase):
 
-    def test_planner_node(self):
+    def test_planner_structured(self):
         mock_llm = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = "- Question 1\n- Question 2\n- Question 3"
-        mock_llm.invoke.return_value = mock_response
-
-        with patch('nodes.llm', mock_llm):
-            state = {"topic": "AI Agents"}
-            result = planner_node(state)
-            self.assertEqual(len(result["plan"]), 3)
-
-    def test_editor_node_research_needed(self):
-        mock_llm = MagicMock()
-        mock_response = MagicMock()
-        mock_response.content = "RESEARCH_NEEDED: We need more data on GPT-5."
-        mock_llm.invoke.return_value = mock_response
-
-        with patch('nodes.llm', mock_llm):
-            state = {"draft": "Data on GPT-4."}
-            result = editor_node(state)
-            self.assertFalse(result["approved"])
-            self.assertIn("RESEARCH_NEEDED", result["critique"])
-
-    def test_routing_to_researcher(self):
-        state = {
-            "approved": False,
-            "revision_count": 1,
-            "critique": "RESEARCH_NEEDED: missing facts."
-        }
-        next_node = should_continue(state)
-        self.assertEqual(next_node, "researcher")
-
-    def test_routing_to_writer(self):
-        state = {
-            "approved": False,
-            "revision_count": 1,
-            "critique": "Fix the formatting."
-        }
-        next_node = should_continue(state)
-        self.assertEqual(next_node, "writer")
-
-    def test_routing_to_end(self):
-        state = {"approved": True}
-        self.assertEqual(should_continue(state), "end")
+        # Simulate structured output
+        class MockOutput(BaseModel):
+            questions: list = ["Q1", "Q2"]
         
-        state = {"approved": False, "revision_count": 3}
-        self.assertEqual(should_continue(state), "end")
+        mock_llm.with_structured_output.return_value.invoke.return_value = MockOutput()
+
+        with patch('nodes.llm', mock_llm):
+            state = AgentState(topic="AI")
+            result = planner_node(state)
+            self.assertEqual(len(result["plan"]), 2)
+
+    def test_router_logic_publisher(self):
+        # Test max revisions
+        state = AgentState(topic="AI", revision_count=3, approved=False)
+        self.assertEqual(router_logic(state), "publisher")
+        
+        # Test editor recommendation
+        state = AgentState(topic="AI", revision_count=1, next_node="researcher")
+        self.assertEqual(router_logic(state), "researcher")
+
+    def test_editor_structured(self):
+        mock_llm = MagicMock()
+        class MockEditor(BaseModel):
+            approved: bool = True
+            feedback: str = "Good"
+            research_needed: bool = False
+            
+        mock_llm.with_structured_output.return_value.invoke.return_value = MockEditor()
+        
+        with patch('nodes.llm', mock_llm):
+            state = AgentState(topic="AI", draft="Great draft")
+            result = editor_node(state)
+            self.assertTrue(result["approved"])
+            self.assertEqual(result["next_node"], "publisher")
 
 if __name__ == "__main__":
     unittest.main()
