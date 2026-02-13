@@ -43,13 +43,31 @@ A robust, multi-agent AI system built with **LangGraph** that autonomously resea
 
 ## 🖥️ Usage
 
-**Start a Research Session:**
+**Start a Research Session (CLI):**
+
 ```bash
+
 python3 main.py
+
 ```
-*Follow the on-screen prompts to approve plans and reviews.*
+
+
+
+**Launch the Research Dashboard (Web):**
+
+```bash
+
+streamlit run dashboard.py
+
+```
+
+*The dashboard allows you to visualize the graph, track session history, and inspect the state of ongoing research.*
+
+
 
 **Run Unit Tests:**
+
+
 ```bash
 python3 -m unittest tests/test_graph.py
 ```
