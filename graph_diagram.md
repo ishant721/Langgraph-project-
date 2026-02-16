@@ -11,7 +11,7 @@ graph TD;
 	planner(planner)
 	researcher(researcher<hr/><small><em>__interrupt = before</em></small>)
 	writer(writer)
-	editor(editor<hr/><small><em>__interrupt = before</em></small>)
+	editor(editor)
 	publisher(publisher<hr/><small><em>__interrupt = before</em></small>)
 	__end__([<p>__end__</p>]):::last
 	__start__ --> planner;

@@ -1,6 +1,6 @@
 import os
 # Set dummy env vars so we can import app without real keys
-os.environ["OPENAI_API_KEY"] = "dummy"
+os.environ["GROQ_API_KEY"] = "dummy"
 os.environ["TAVILY_API_KEY"] = "dummy"
 
 from graph import app

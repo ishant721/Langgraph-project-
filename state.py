@@ -12,3 +12,5 @@ class AgentState(BaseModel):
     approved: bool = Field(default=False, description="Whether the report is finalized")
     report_path: Optional[str] = Field(default=None, description="Path to the saved report")
     next_node: Optional[str] = Field(default=None, description="The next node to execute (for supervisor logic)")
+    chat_history: List[dict] = Field(default_factory=list, description="History of Q&A sessions")
+    image_urls: List[str] = Field(default_factory=list, description="List of generated image URLs for the report")

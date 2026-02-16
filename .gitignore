@@ -3,3 +3,11 @@ checkpoints.sqlite
 __pycache__/
 .pytest_cache/
 tests/__pycache__/
+report_*.md
+images/
+*.png
+*.jpg
+*.jpeg
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal

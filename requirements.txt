@@ -1,6 +1,7 @@
 langgraph
 langchain
 langchain-openai
+langchain-groq
 langchain-community
 langchain-tavily
 python-dotenv

@@ -2,10 +2,12 @@ import os
 import sys
 import logging
 from dotenv import load_dotenv
+
+# Load env vars before importing app
+load_dotenv()
+
 from graph import app
 from state import AgentState
-
-load_dotenv()
 
 # Silence noisy libraries
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -75,8 +77,8 @@ def run_suite(topic: str):
         print("\n⚠️ Session ended without publication.")
 
 if __name__ == "__main__":
-    if not os.getenv("OPENAI_API_KEY"):
-        print("❌ Error: OPENAI_API_KEY missing.")
+    if not os.getenv("GROQ_API_KEY"):
+        print("❌ Error: GROQ_API_KEY missing.")
         sys.exit(1)
         
     topic = input("Enter research topic: ").strip()
